@@ -11,10 +11,10 @@ export class TBillScrapper {
   protected initiateScrapping = async () => {
     try {
       const browser = await puppeteer.launch({
-        headless: false,
+        headless: "new",
         executablePath:
           "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        // args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
       const page = await browser.newPage();
       await page.setViewport({ width: 1080, height: 1024 });
@@ -49,6 +49,7 @@ export class TBillScrapper {
           }
         }
       }
+      await browser.close();
     } catch (error) {
       console.error(error);
     }
@@ -56,8 +57,8 @@ export class TBillScrapper {
   public async getTBill() {
     const tBill: IRates[] = [];
     const loadingInterval = setInterval(() => {
-        process.stdout.write(`${this.getRandomEmoji()}`); // Print a dot as a loading indicator
-      }, 500);
+      process.stdout.write(`${this.getRandomEmoji()} \t`); // Print a dot as a loading indicator
+    }, 500);
     try {
       await this.initiateScrapping();
       for (let item = 0; item < this.Day.length; item++) {
@@ -68,17 +69,38 @@ export class TBillScrapper {
           interestRate: this.interestRate[item],
         };
       }
-      console.log(tBill)
+      
+     
       return tBill;
     } catch (error) {
     } finally {
-        clearInterval(loadingInterval);
-        console.log(`\n${this.getRandomEmoji()}  Done!`);
+      clearInterval(loadingInterval);
+      console.log(`\n${this.getRandomEmoji()}  Done!`);
     }
   }
-
   private getRandomEmoji() {
-    const emojis = ["😊", "🚀", "🌟", "🎉", "🥷🏾", "🔦", "🍕", "💯", "🎈", "🌺", "✅", "📝", "🧟‍♂️", "🤩", "🫀", "🍾", "🥂", "🏃🏽‍♂️", "👑", "🔥"] ;
+    const emojis = [
+      "😊",
+      "🚀",
+      "🌟",
+      "🎉",
+      "🥷🏾",
+      "🔦",
+      "🍕",
+      "💯",
+      "🎈",
+      "🌺",
+      "✅",
+      "📝",
+      "🧟‍♂️",
+      "🤩",
+      "🫀",
+      "🍾",
+      "🥂",
+      "🏃🏽‍♂️",
+      "👑",
+      "🔥",
+    ];
     const randomIndex = Math.floor(Math.random() * emojis.length);
     return emojis[randomIndex];
   }
