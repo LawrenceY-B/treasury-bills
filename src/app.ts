@@ -22,7 +22,7 @@ const limiter = rateLimit({
     skip: (req:Request, res:Response) =>{
         let userIP=getClientIp(req)
         console.log(userIP)
-        return allowlist.includes(userIP as string)}, // Fix: Return a boolean value
+        return allowlist.includes(userIP as string)},
     skipFailedRequests:true,
 })
 app.use(limiter)
