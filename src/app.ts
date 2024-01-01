@@ -3,6 +3,8 @@ import "dotenv/config";
 import { createServer } from "http";
 import ErrorHandler from "./middleware/ErrorHandler";
 import tBillRoutes from "./routes/tbill.routes";
+import { DB_Connection } from "./database/db";
+import { UpdateDB } from "./utils/updateDB.job";
 
 const app = express();
 const server = createServer(app);
@@ -30,7 +32,8 @@ app.all("*", (req: Request, res: Response) => {
   res.status(404).json({ message: "Page Not Found 😔" });
   console.log("Page Not Found 😔");
 });
-
+UpdateDB();
 const httpserver = server.listen(port, async () => {
+    await DB_Connection();
   console.log(`🚀🚀🚀Server is running on port ${process.env.PORT}`);
 });
