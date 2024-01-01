@@ -9,6 +9,8 @@ export const getTBill = async (
 ) => {
   try {
     const data = await TBillData.find({});
+    console.log('ip: '+req.ip)
+
     if (!data)
       res.status(404).json({ success: false, message: "No data found" });
     res.status(200).json({ success: true, data });
