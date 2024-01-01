@@ -17,6 +17,8 @@ require("dotenv/config");
 const http_1 = require("http");
 const ErrorHandler_1 = __importDefault(require("./middleware/ErrorHandler"));
 const tbill_routes_1 = __importDefault(require("./routes/tbill.routes"));
+const db_1 = require("./database/db");
+const updateDB_job_1 = require("./utils/updateDB.job");
 const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);
 const port = process.env.PORT || 8080;
@@ -35,6 +37,8 @@ app.all("*", (req, res) => {
     res.status(404).json({ message: "Page Not Found 😔" });
     console.log("Page Not Found 😔");
 });
+(0, updateDB_job_1.UpdateDB)();
 const httpserver = server.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, db_1.DB_Connection)();
     console.log(`🚀🚀🚀Server is running on port ${process.env.PORT}`);
 }));

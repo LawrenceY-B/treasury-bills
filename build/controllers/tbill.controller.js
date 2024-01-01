@@ -8,13 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTBill = void 0;
-const scrapper_1 = require("../utils/scrapper");
+exports.getTBillDays = exports.getTBill = void 0;
+const rate_model_1 = __importDefault(require("../models/rate.model"));
 const getTBill = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const crawler = new scrapper_1.TBillScrapper();
-        const data = yield crawler.getTBill();
+        const data = yield rate_model_1.default.find({});
+        if (!data)
+            res.status(404).json({ success: false, message: "No data found" });
         res.status(200).json({ success: true, data });
     }
     catch (error) {
@@ -22,3 +26,21 @@ const getTBill = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getTBill = getTBill;
+const getTBillDays = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { days } = req.query;
+        if (days !== "91" && days !== "182" && days !== "364")
+            res
+                .status(400)
+                .json({ success: false, message: "Invalid query parameter" });
+        const query = `${days} DAY BILL`;
+        const data = yield rate_model_1.default.find({ securityType: query });
+        if (!data)
+            res.status(404).json({ success: false, message: "No data found" });
+        res.status(200).json({ success: true, data });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getTBillDays = getTBillDays;
