@@ -1,7 +1,8 @@
 import {Router} from "express"
-import {getTBill} from "../controllers/tbill.controller"
+import {getTBill, getTBillDays} from "../controllers/tbill.controller"
 
 const tBillRoutes = Router()
-tBillRoutes.get('/get-tbill', getTBill)
+tBillRoutes.get('/get-all-tbill', getTBill)
+tBillRoutes.get('/get-tbill', getTBillDays)
 
 export default tBillRoutes

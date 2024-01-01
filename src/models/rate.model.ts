@@ -7,11 +7,11 @@ const TbillSchema = new Schema<ITBill>(
     securityType: { type: String },
     discountRate: { type: String },
     interestRate: { type: String },
-    createdAt: { type: Date, default: Date.now, index: { expires: 7 * 24 * 60 * 60 * 1000 } },
+    createdAt: { type: Date, default: Date.now, index: { expires: '7d' } },
 },
   { timestamps: true }
 );
 
-const TBillData = model<ITBill>("TBilldata", TbillSchema);
+const TBillData = model<ITBill>("TBillRates", TbillSchema);
 
 export default TBillData;

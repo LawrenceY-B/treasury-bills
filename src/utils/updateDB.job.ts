@@ -4,14 +4,14 @@ import { TBillScrapper } from "./scrapper";
 
 export const UpdateDB = async () => {
   try {
-    const scrpt = cron.schedule("0 0 */7 * *", async () => {
+    const script = cron.schedule("0 0 */7 * *", async () => {
       console.log("Cron job scheduled");
       const crawler = new TBillScrapper();
       const data = await crawler.getTBill();
-      data?.map(async (row) => {
-        const newData = new TBillData(row);
+      for (let i = 0; i < data!.length; i++) {
+        const newData = new TBillData(data![i]);
         await newData.save();
-      });
+      }
     });
   } catch (error) {
     console.error(error);
