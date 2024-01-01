@@ -17,7 +17,7 @@ export class TBillScrapper {
         // args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
       const page = await browser.newPage();
-      await page.setViewport({ width: 1080, height: 1024 });
+    //   await page.setViewport({ width: 1080, height: 1024 });
       await page.goto(
         "https://www.bog.gov.gh/treasury-and-the-markets/treasury-bill-rates/"
       );
@@ -57,7 +57,7 @@ export class TBillScrapper {
   public async getTBill() {
     const tBill: IRates[] = [];
     const loadingInterval = setInterval(() => {
-      process.stdout.write(`${this.getRandomEmoji()} \t`); // Print a dot as a loading indicator
+      process.stdout.write(`${this.getRandomEmoji()} \t`); 
     }, 500);
     try {
       await this.initiateScrapping();
