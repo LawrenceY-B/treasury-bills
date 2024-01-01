@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { IRates } from "../model/rates.model";
+import { IRates } from "../interfaces/rates.interface";
 
 export class TBillScrapper {
   private Day: string[] = [];
