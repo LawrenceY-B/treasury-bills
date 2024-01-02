@@ -4,7 +4,7 @@ Welcome to the **Treasury Bill API**! 🌐
 
 **Base URL:** `https://3cbspe2hyj.us-east-1.awsapprunner.com/api`
 
-**Note:** 🚧 For the time being, the API may not be available. However, you can clone the project and provide a port number to run the project locally.
+**Note:** 🚧 For the time being, the API may not be available (Maximum Requests:8 request in 12 hours😔). However, you can clone the project and provide a port number to run the project locally.
 
 ## 🚀 API Requests
 
