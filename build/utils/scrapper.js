@@ -28,7 +28,7 @@ class TBillScrapper {
                     // args: ["--no-sandbox", "--disable-setuid-sandbox"],
                 });
                 const page = yield browser.newPage();
-                yield page.setViewport({ width: 1080, height: 1024 });
+                //   await page.setViewport({ width: 1080, height: 1024 });
                 yield page.goto("https://www.bog.gov.gh/treasury-and-the-markets/treasury-bill-rates/");
                 yield page.waitForSelector("#table_1");
                 const t_BillTable = yield page.$$("#table_1");
@@ -68,7 +68,7 @@ class TBillScrapper {
         return __awaiter(this, void 0, void 0, function* () {
             const tBill = [];
             const loadingInterval = setInterval(() => {
-                process.stdout.write(`${this.getRandomEmoji()} \t`); // Print a dot as a loading indicator
+                process.stdout.write(`${this.getRandomEmoji()} \t`);
             }, 500);
             try {
                 yield this.initiateScrapping();

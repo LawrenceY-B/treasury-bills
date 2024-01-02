@@ -17,6 +17,7 @@ const rate_model_1 = __importDefault(require("../models/rate.model"));
 const getTBill = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = yield rate_model_1.default.find({});
+        console.log('ip: ' + req.ip);
         if (!data)
             res.status(404).json({ success: false, message: "No data found" });
         res.status(200).json({ success: true, data });
