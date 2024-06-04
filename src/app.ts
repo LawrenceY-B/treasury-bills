@@ -15,17 +15,17 @@ const IP= process.env.IP_ADDRESS
 const allowlist = [`${IP}`]
 
 //comment this in development
-const limiter = rateLimit({
-	windowMs: 12 * 60 * 60 * 1000,
-	limit: 8, 
-	message: "Too many requests from this IP😅, please try again after 12 hours😔. max request limit = 8",
-    skip: (req:Request, res:Response) =>{
-        let userIP=getClientIp(req)
-        console.log(userIP)
-        return allowlist.includes(userIP as string)},
-    skipFailedRequests:true,
-})
-app.use(limiter)
+// const limiter = rateLimit({
+// 	windowMs: 12 * 60 * 60 * 1000,
+// 	limit: 8, 
+// 	message: "Too many requests from this IP😅, please try again after 12 hours😔. max request limit = 8",
+//     skip: (req:Request, res:Response) =>{
+//         let userIP=getClientIp(req)
+//         console.log(userIP)
+//         return allowlist.includes(userIP as string)},
+//     skipFailedRequests:true,
+// })
+// app.use(limiter)
 app
   .use((req: Request, res: Response, next: NextFunction) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -49,7 +49,7 @@ app.all("*", (req: Request, res: Response) => {
   console.log("Page Not Found 😔");
 });
 UpdateDB();
-const httpserver = server.listen(port, async () => {
+ server.listen(port, async () => {
     await DB_Connection();
   console.log(`🚀🚀🚀Server is running on port ${process.env.PORT}`);
 });
