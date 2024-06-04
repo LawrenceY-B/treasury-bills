@@ -6,3 +6,5 @@
 
 node_modules/
 trial/
+build/
+.DS_Store
