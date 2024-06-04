@@ -4,7 +4,7 @@ import { TBillScrapper } from "./scrapper";
 
 export const UpdateDB = async () => {
   try {
-    const script = cron.schedule("0 0 */7 * *", async () => {
+    cron.schedule("0 0 */7 * *", async () => {
       console.log("Cron job scheduled");
       const crawler = new TBillScrapper();
       const data = await crawler.getTBill();
