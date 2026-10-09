@@ -10,6 +10,7 @@ import { IRates } from "./interfaces/rates.interface";
 import { UpdateDB } from "./utils/updateDB.job";
 import { syncGse } from "./utils/gse.sync";
 import { buildInsights } from "./utils/gse.insights";
+import { cacheEnabled, clearCache } from "./utils/cache";
 
 // The page lists the newest auction first, so the first row per bill type is the latest
 const latestRates = (rows: IRates[]) =>
@@ -67,7 +68,6 @@ const runJob = async (name: string, job: () => Promise<string>) => {
   }
 };
 
-// Daily scrape, run by the scheduled GitHub Actions workflow (npm run scrape)
 const run = async () => {
   await mongoose.connect(`${process.env.DB_URL}`);
   await Promise.all([TBillData, Stock, StockPrice, MarketSummary].map((m) => m.syncIndexes()));
@@ -89,6 +89,12 @@ const run = async () => {
   ];
 
   if (process.env.SUMMARY_FILE) writeFileSync(process.env.SUMMARY_FILE, results.map((r) => r.html).join("\n<hr>\n"));
+  // new data is in, so drop cached API responses; a failure here must not fail the scrape
+  try {
+    if (cacheEnabled()) console.log(`Cache cleared: ${await clearCache()} keys`);
+  } catch (error) {
+    console.error("Could not clear the cache:", String(error));
+  }
   if (results.some((r) => !r.ok)) throw new Error("One or more jobs failed");
 };
 

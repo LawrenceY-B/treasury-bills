@@ -16,7 +16,6 @@ export class TBillScrapper {
         args: process.env.CI ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
       });
       const page = await browser.newPage();
-    //   await page.setViewport({ width: 1080, height: 1024 });
       await page.goto(
         "https://www.bog.gov.gh/treasury-and-the-markets/treasury-bill-rates/"
       );

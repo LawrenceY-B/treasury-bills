@@ -7,13 +7,14 @@ import {
   getStockHistory,
   getStocks,
 } from "../controllers/gse.controller";
+import { cache } from "../middleware/cache";
 
 const gseRoutes = Router();
-gseRoutes.get("/stocks", getStocks);
-gseRoutes.get("/stocks/:symbol", getStock);
-gseRoutes.get("/stocks/:symbol/history", getStockHistory);
-gseRoutes.get("/market", getMarket);
-gseRoutes.get("/market/history", getMarketHistory);
-gseRoutes.get("/insights", getInsights);
+gseRoutes.get("/stocks", cache(), getStocks);
+gseRoutes.get("/stocks/:symbol", cache(), getStock);
+gseRoutes.get("/stocks/:symbol/history", cache(), getStockHistory);
+gseRoutes.get("/market", cache(), getMarket);
+gseRoutes.get("/market/history", cache(), getMarketHistory);
+gseRoutes.get("/insights", cache(), getInsights);
 
 export default gseRoutes;

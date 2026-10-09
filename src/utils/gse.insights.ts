@@ -130,7 +130,6 @@ export const buildInsights = async (period: Period) => {
     equivalentForPeriod: round((t.interestRate * days) / 365),
   }));
 
-  // Plain-English summary
   const when = PERIODS[period];
   const ci = market.gseCI.changePercent;
   const fsi = market.gseFSI.changePercent;

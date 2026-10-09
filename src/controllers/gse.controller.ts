@@ -44,7 +44,6 @@ const rangeChange = (baseline: number | null | undefined, last: number | null | 
   changePercent: percentChange(baseline, last),
 });
 
-// GET /api/gse/stocks?all=true
 export const getStocks = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const companies = new Map((await Stock.find().lean<IStock[]>()).map((s) => [s.symbol, s]));
@@ -90,7 +89,6 @@ const findSymbol = async (raw: string) => {
   return { symbol, latest };
 };
 
-// GET /api/gse/stocks/:symbol
 export const getStock = async (req: Request<{ symbol: string }>, res: Response, next: NextFunction) => {
   try {
     const { symbol, latest } = await findSymbol(req.params.symbol);
@@ -113,7 +111,6 @@ export const getStock = async (req: Request<{ symbol: string }>, res: Response, 
   }
 };
 
-// GET /api/gse/stocks/:symbol/history?period=1y (or from=&to=), optional limit
 export const getStockHistory = async (req: Request<{ symbol: string }>, res: Response, next: NextFunction) => {
   try {
     const { symbol, latest } = await findSymbol(req.params.symbol);
@@ -143,7 +140,6 @@ export const getStockHistory = async (req: Request<{ symbol: string }>, res: Res
   }
 };
 
-// GET /api/gse/market
 export const getMarket = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const [latest, previous] = await MarketSummary.find().sort({ date: -1 }).limit(2).lean<IMarketSummary[]>();
@@ -175,7 +171,6 @@ export const getMarket = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
-// GET /api/gse/market/history?period=1y (or from=&to=), optional limit
 export const getMarketHistory = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { period, filter } = await historyRange(req, async () =>
@@ -201,7 +196,6 @@ export const getMarketHistory = async (req: Request, res: Response, next: NextFu
   }
 };
 
-// GET /api/gse/insights?period=1m
 export const getInsights = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const period = parsePeriod(req.query.period, INSIGHT_PERIODS, "1m");

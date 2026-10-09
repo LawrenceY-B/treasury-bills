@@ -6,7 +6,6 @@ import Stock from "./models/stock.model";
 import StockPrice from "./models/stockPrice.model";
 import { syncGse } from "./utils/gse.sync";
 
-// One-off import of all Ghana Stock Exchange history (npm run gse:backfill)
 const run = async () => {
   await mongoose.connect(`${process.env.DB_URL}`);
   await Promise.all([Stock.syncIndexes(), StockPrice.syncIndexes(), MarketSummary.syncIndexes()]);

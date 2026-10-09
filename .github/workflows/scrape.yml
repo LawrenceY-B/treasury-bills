@@ -25,6 +25,8 @@ jobs:
       - run: npm run scrape
         env:
           DB_URL: ${{ secrets.DB_URL }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
           CHROME_PATH: /usr/bin/google-chrome
           SUMMARY_FILE: scrape-summary.html
 
