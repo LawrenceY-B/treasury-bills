@@ -1,4 +1,4 @@
-name: Scrape T-bill rates
+name: Scrape T-bill rates and GSE data
 
 on:
   schedule:
@@ -42,6 +42,12 @@ jobs:
           subject: T-bill rates updated
           html_body: file://scrape-summary.html
 
+      # e.g. npm ci failed, so the scrape never wrote a summary
+      - name: Fallback failure summary
+        if: failure()
+        run: |
+          test -f scrape-summary.html || echo '<h2>❌ The run failed before scraping</h2><p><a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">View the logs</a></p>' > scrape-summary.html
+
       - name: Email the failure
         if: failure()
         uses: dawidd6/action-send-mail@v22
@@ -53,5 +59,6 @@ jobs:
           password: ${{ secrets.MAIL_PASSWORD }}
           from: T-bill scraper <${{ secrets.MAIL_USERNAME }}>
           to: ${{ secrets.MAIL_USERNAME }}
-          subject: ❌ T-bill scrape failed
-          body: "The scrape failed. Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          subject: ❌ T-bill / GSE scrape failed
+          html_body: file://scrape-summary.html
+          body: "Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
