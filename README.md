@@ -2,9 +2,11 @@
 
 Welcome to the **Treasury Bill API**! 🌐
 
-**Base URL:** `https://3cbspe2hyj.us-east-1.awsapprunner.com/api`
+**Base URL:** `https://treasury-bills.onrender.com/api`
 
-**Note:** 🚧 For the time being, the API may not be available (Maximum Requests:8 request in 12 hours😔). However, you can clone the project and provide a port number to run the project locally.
+**Note:** 🚧 The API is hosted on Render's free tier, so it sleeps when idle. The first request after a quiet spell can take 30–60 seconds; after that it's fast. You can also run it locally (see below).
+
+**Example:** `https://treasury-bills.onrender.com/api/get-tbill?days=91`
 
 ## 🚀 API Requests
 
