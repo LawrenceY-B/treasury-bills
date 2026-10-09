@@ -5,7 +5,6 @@ import { createServer } from "http";
 import ErrorHandler from "./middleware/ErrorHandler";
 import tBillRoutes from "./routes/tbill.routes";
 import { DB_Connection } from "./database/db";
-import { UpdateDB } from "./utils/updateDB.job";
 import { rateLimit } from 'express-rate-limit'
 import {getClientIp} from "request-ip"
 
@@ -49,7 +48,6 @@ app.use((req: Request, res: Response) => {
   console.log("Page Not Found 😔");
 });
 app.use(ErrorHandler);
-UpdateDB();
  server.listen(port, async () => {
     await DB_Connection();
   console.log(`🚀🚀🚀Server is running on port ${process.env.PORT}`);

@@ -12,9 +12,8 @@ export class TBillScrapper {
     try {
       const browser = await puppeteer.launch({
         headless: true,
-        executablePath:
-          "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-        // args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        executablePath: process.env.CHROME_PATH || undefined,
+        args: process.env.CI ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
       });
       const page = await browser.newPage();
     //   await page.setViewport({ width: 1080, height: 1024 });

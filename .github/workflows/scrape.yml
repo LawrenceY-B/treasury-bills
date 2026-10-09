@@ -1,0 +1,57 @@
+name: Scrape T-bill rates
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # daily at 09:00 UTC; upserts make re-runs harmless
+  workflow_dispatch: # allows a manual run from the Actions tab
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      # use the Chrome preinstalled on the runner instead of downloading one
+      - run: npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "true"
+
+      - run: npm run scrape
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          CHROME_PATH: /usr/bin/google-chrome
+          SUMMARY_FILE: scrape-summary.html
+
+      - name: Email the latest rates
+        if: success()
+        uses: dawidd6/action-send-mail@v22
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: T-bill scraper <${{ secrets.MAIL_USERNAME }}>
+          to: ${{ secrets.MAIL_USERNAME }}
+          subject: T-bill rates updated
+          html_body: file://scrape-summary.html
+
+      - name: Email the failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v22
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: T-bill scraper <${{ secrets.MAIL_USERNAME }}>
+          to: ${{ secrets.MAIL_USERNAME }}
+          subject: ❌ T-bill scrape failed
+          body: "The scrape failed. Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
