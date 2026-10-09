@@ -43,6 +43,27 @@ app
   .use(express.json())
   .use("/api", tBillRoutes);
 
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({
+    message: "💰 Treasury Bill API 💹",
+    source: "https://www.bog.gov.gh/treasury-and-the-markets/treasury-bill-rates/",
+    endpoints: [
+      {
+        method: "GET",
+        path: "/api/get-all-tbill",
+        description: "All stored Treasury Bill rates",
+      },
+      {
+        method: "GET",
+        path: "/api/get-tbill?days={91|182|364}",
+        description: "Treasury Bill rates for one tenor",
+        example: "/api/get-tbill?days=91",
+      },
+    ],
+    docs: "https://github.com/LawrenceY-B/treasury-bills",
+  });
+});
+
 app.use((req: Request, res: Response) => {
   res.status(404).json({ message: "Page Not Found 😔" });
   console.log("Page Not Found 😔");
