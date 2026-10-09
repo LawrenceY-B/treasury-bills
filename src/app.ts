@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ quiet: true });
 import { createServer } from "http";
 import ErrorHandler from "./middleware/ErrorHandler";
 import tBillRoutes from "./routes/tbill.routes";
@@ -42,12 +43,12 @@ app
   })
   .use(express.json())
   .use("/api", tBillRoutes);
-app.use(ErrorHandler);
 
-app.all("*", (req: Request, res: Response) => {
+app.use((req: Request, res: Response) => {
   res.status(404).json({ message: "Page Not Found 😔" });
   console.log("Page Not Found 😔");
 });
+app.use(ErrorHandler);
 UpdateDB();
  server.listen(port, async () => {
     await DB_Connection();

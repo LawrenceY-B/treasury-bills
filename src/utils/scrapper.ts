@@ -11,7 +11,7 @@ export class TBillScrapper {
   protected initiateScrapping = async () => {
     try {
       const browser = await puppeteer.launch({
-        headless: "new",
+        headless: true,
         executablePath:
           "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
         // args: ["--no-sandbox", "--disable-setuid-sandbox"],
