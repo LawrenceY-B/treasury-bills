@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import type { ApiService } from "../service/api.js";
+import { askDisplay, isInputRequired } from "./display.js";
 import { json, sample, wantsHistory } from "./format.js";
 import { historyRange } from "./schemas.js";
 
@@ -32,13 +33,20 @@ export const registerStockTools = (server: McpServer, api: ApiService) => {
             ...historyRange,
         }),
         annotations: { readOnlyHint: true },
-    }, async ({ symbol, ...range }) => {
+    }, async ({ symbol, ...range }, ctx) => {
         if (!wantsHistory(range)) return json(await api.getStock(symbol));
 
-        const [detail, history] = await Promise.all([api.getStock(symbol), api.getStockHistory(symbol, range)]);
+        // ask how to show it while the data loads
+        const [display, detail, history] = await Promise.all([
+            askDisplay(ctx),
+            api.getStock(symbol),
+            api.getStockHistory(symbol, range),
+        ]);
+        if (isInputRequired(display)) return display;
         const thinned = range.limit ? { rows: history.data, sampled: false } : sample(history.data);
         return json({
             ...detail,
+            display,
             range: {
                 period: history.meta?.period ?? null,
                 from: history.meta?.from ?? null,

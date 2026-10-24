@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import type { ApiService } from "../service/api.js";
+import { askDisplay, isInputRequired } from "./display.js";
 import { json, sample, wantsHistory } from "./format.js";
 import { historyRange, insightPeriod } from "./schemas.js";
 
@@ -13,13 +14,20 @@ export const registerMarketTools = (server: McpServer, api: ApiService) => {
             "Add `period` (or `from`/`to`) to also get the daily index history and the GSE-CI's % change over that range. Index history starts in July 2023.",
         inputSchema: z.object(historyRange),
         annotations: { readOnlyHint: true },
-    }, async (range) => {
+    }, async (range, ctx) => {
         if (!wantsHistory(range)) return json(await api.getMarketData());
 
-        const [latest, history] = await Promise.all([api.getMarketData(), api.getMarketHistory(range)]);
+        // ask how to show it while the data loads
+        const [display, latest, history] = await Promise.all([
+            askDisplay(ctx),
+            api.getMarketData(),
+            api.getMarketHistory(range),
+        ]);
+        if (isInputRequired(display)) return display;
         const thinned = range.limit ? { rows: history.data, sampled: false } : sample(history.data);
         return json({
             ...latest,
+            display,
             range: {
                 period: history.meta?.period ?? null,
                 from: history.meta?.from ?? null,

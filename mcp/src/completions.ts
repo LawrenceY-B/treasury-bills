@@ -1,7 +1,6 @@
 import type { ApiService } from "./service/api.js";
 
 const TTL_MS = 60 * 60 * 1000;
-const MAX_SUGGESTIONS = 20;
 
 // Suggests stock symbols as the user types. The list is cached for an hour so
 // each keystroke doesn't hit the API (and wait on Render's cold start).
@@ -17,7 +16,8 @@ export const symbolCompleter = (api: ApiService) => {
                 return []; // no suggestions is better than a failed completion
             }
         }
-        const prefix = value.toUpperCase();
-        return cache.symbols.filter((s) => s.startsWith(prefix)).slice(0, MAX_SUGGESTIONS);
+        // return every match: the SDK caps the list at 100 and fills in total/hasMore from it
+        const prefix = (value ?? "").toUpperCase();
+        return cache.symbols.filter((s) => s.startsWith(prefix));
     };
 };

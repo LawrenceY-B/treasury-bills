@@ -11,9 +11,11 @@ const INSTRUCTIONS = `Ghana Treasury bill rates (Bank of Ghana weekly auctions) 
 
 - Find ticker symbols with list_stocks; don't guess them.
 - For market-wide questions (how the market is doing, top movers, stocks vs T-bills) use get_market_insights instead of fetching many stocks.
-- Answer in text first, with the key numbers. Don't draw charts or tables unless the user asked for one: they cost a lot of tokens.
-- When the answer covers a trend over time or a comparison (a stock's price history, the GSE-CI over a period, several stocks side by side, T-bill rates across recent auctions), end with a one-line offer: "Want a chart or a table of this?"
-- If the user asks for a chart and a charting or visualization tool is available, use it (e.g. a line chart of close or gseCI by date); if none is available, offer a short table instead. If they ask for a table, keep it to the key rows.
+- When get_stock or get_market return history, the user is asked how they want it shown, and the result's \`display\` field holds their choice. Follow it:
+  - "chart" (the default): draw a chart with a charting or visualization tool if one is available (e.g. a line chart of close or gseCI by date); if none is available, show a short table instead.
+  - "table": a short table of the key rows only.
+  - "text": no chart or table, just the key numbers in prose.
+- If the user's own message asks for a chart or a table, that wins over \`display\`.
 - Never chart a single value such as one current price or one rate.
 - get_tbill_rates only has about the last month of auctions. ${BOG_LOOKUP_RULE}
 - When range.sampled is true, the rows are evenly thinned; range.change is still exact for the whole range.`;

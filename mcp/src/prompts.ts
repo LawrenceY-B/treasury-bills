@@ -16,9 +16,9 @@ const BRIEFS = {
 type Frequency = keyof typeof BRIEFS;
 const FREQUENCIES = Object.keys(BRIEFS) as [Frequency, ...Frequency[]];
 
-// charts and tables are costly in tokens, so offer them instead of drawing them by default
-const OFFER_VISUAL = (subject: string) =>
-    `Don't draw a chart or table yet. End with one line offering a chart or a table of ${subject}, and only make it if I say yes.`;
+// the history tools ask the user (chart by default) and return the answer as `display`
+const SHOW_AS = (subject: string) =>
+    `Show ${subject} the way the tool result's \`display\` field says: a chart (the default), a short table, or text only.`;
 
 const userMessage =(text: string) => ({
     messages: [{ role: "user" as const, content: { type: "text" as const, text } }],
@@ -57,7 +57,7 @@ Structure the brief as:
 - Top 3 gainers and top 3 losers, with % changes.
 - Anything unusual: heavy volume, stocks near 52-week highs or lows.
 - Stocks vs T-bills: the market's return against the 91- and 364-day bills over the same period${tBillsFromTools ? "" : ", using only rates from bog.gov.gh and citing the page"}.
-- ${OFFER_VISUAL("the GSE-CI over the period")}
+- ${SHOW_AS("the GSE-CI over the period")}
 
 Keep it under ${words} words, use GH¢ for prices, and don't give investment advice.`
         );
@@ -86,7 +86,7 @@ Cover:
 - What the company is and its latest price (GH¢) and daily move.
 - Its return over ${returns}.
 - Where the price sits in its 52-week range, and whether recent volume is unusual.
-- ${OFFER_VISUAL(`the closing price over the ${chartSpan}`)}
+- ${SHOW_AS(`the closing price over the ${chartSpan}`)}
 
 If the symbol is unknown, use list_stocks to suggest the closest matches. Be factual and don't give investment advice.`
         );
