@@ -2,7 +2,7 @@
 
 A read-only JSON API for **Bank of Ghana Treasury Bill rates** and **Ghana Stock Exchange (GSE)** data: prices, market indices and plain-English insights. It is TypeScript, Express 5, Mongoose 9 and MongoDB, with an optional Upstash Redis cache.
 
-The API runs on Render at `https://treasury-bills.onrender.com`. A daily GitHub Actions job keeps the data current. The API server **never scrapes**; it only reads MongoDB.
+The API runs on Render at `https://treasury-bills.onrender.com`. A GitHub Actions job (Mon–Sat) keeps the data current. The API server **never scrapes**; it only reads MongoDB.
 
 ## Commands
 
@@ -21,7 +21,7 @@ There are no tests or linter. Use `npm run build` as the type check.
 There are two entry points:
 
 1. **`src/app.ts`**: the Express API. It sets CORS headers by hand (GET only) and mounts `/api/gse` and then `/api`. `/` returns a JSON list of endpoints, so **update it when you add or change routes**, along with the README.
-2. **`src/scrape.ts`**: the scheduled job, run by `.github/workflows/scrape.yml` daily at 09:00 UTC and on manual dispatch. It runs two independent jobs (`runJob`) so one failing doesn't block the other:
+2. **`src/scrape.ts`**: the scheduled job, run by `.github/workflows/scrape.yml` Mon–Sat at 09:00 UTC (GitHub often starts it hours late; no Sunday run since the GSE doesn't trade at weekends) and on manual dispatch. It runs two independent jobs (`runJob`) so one failing doesn't block the other:
    - **T-bill scrape** (`utils/updateDB.job.ts` → `utils/scrapper.ts`): Puppeteer loads the BoG page and reads `#table_1`, then the rows are upserted on `{days, securityType}`. BoG auctions weekly (results on Friday, issue date the next Monday), so scheduled runs only scrape T-bills on **Saturdays and Mondays** (UTC, `TBILL_DAYS` in `scrape.ts`). Manual (`workflow_dispatch`) and local runs always scrape.
    - **GSE sync** (`utils/gse.sync.ts` → `utils/gse.client.ts`): no browser. It POSTs to the GSE site's wpDataTables `admin-ajax.php` endpoint, using a nonce scraped from the page HTML. Daily mode fetches the newest ~1000 price rows and 30 summaries, which is enough to catch up a missed day. `{ full: true }` pages through everything.
    - After both jobs it writes an HTML summary to `SUMMARY_FILE`, which the workflow emails, and clears the Redis cache.

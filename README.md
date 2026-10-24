@@ -71,7 +71,7 @@ For production, run `npm run build` then `npm start`.
 
 ## Deployment
 
-- **Scraper:** a GitHub Actions workflow (`.github/workflows/scrape.yml`) runs every day at 09:00 UTC and emails a summary. Add these repo secrets: `DB_URL`, `MAIL_USERNAME`, `MAIL_PASSWORD` (a Gmail [app password](https://myaccount.google.com/apppasswords)), and optionally the two Upstash values.
+- **Scraper:** a GitHub Actions workflow (`.github/workflows/scrape.yml`) runs Monday to Saturday at 09:00 UTC and emails a summary. Add these repo secrets: `DB_URL`, `MAIL_USERNAME`, `MAIL_PASSWORD` (a Gmail [app password](https://myaccount.google.com/apppasswords)), and optionally the two Upstash values.
 - **API:** any Node host, e.g. Render. Build with `npm install && npm run build`, start with `npm start`, and set `DB_URL`, `PUPPETEER_SKIP_DOWNLOAD=true` and optionally the two Upstash values.
 
 ## Data Sources

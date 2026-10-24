@@ -2,7 +2,7 @@ name: Scrape T-bill rates and GSE data
 
 on:
   schedule:
-    - cron: "0 9 * * *" # daily at 09:00 UTC; T-bills only on Saturdays and Mondays (see src/scrape.ts)
+    - cron: "0 9 * * 1-6" # Mon–Sat at 09:00 UTC (GitHub often starts it hours late); T-bills only on Sat and Mon (see src/scrape.ts)
   workflow_dispatch:
 
 jobs:
