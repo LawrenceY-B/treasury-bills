@@ -35,7 +35,7 @@ app
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
-    message: "💰 Ghana Treasury Bill & Stock Exchange API 💹",
+    message: "Ghana Treasury Bill & Stock Exchange API",
     sources: [
       "https://www.bog.gov.gh/treasury-and-the-markets/treasury-bill-rates/",
       "https://gse.com.gh/trading-and-data/",
