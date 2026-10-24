@@ -34,6 +34,16 @@ Example: `/gse/stocks/MTNGH/history?period=6m`
 
 Symbols are case-insensitive, and missing values are `null`. Errors look like `{ "success": false, "message": "..." }`.
 
+## Use it from Claude (MCP)
+
+The API is also available as an MCP server, so Claude can answer questions like "how did MTN Ghana do this year?" directly:
+
+```bash
+claude mcp add --transport http lyb-cedi-market https://lyb-cedi-market.onrender.com/mcp
+```
+
+See [`mcp/README.md`](mcp/README.md) for the tools, prompts and local setup.
+
 ## Caching (optional)
 
 Responses are cached in Redis for 24 hours, and the daily scrape clears the cache. Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from a free [Upstash](https://upstash.com) database to turn it on. Without them the API reads straight from MongoDB.
