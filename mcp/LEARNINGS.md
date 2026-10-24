@@ -186,6 +186,7 @@ return inputRequired({ inputRequests: { [KEY]: inputRequired.elicit({ message, r
 - **One question can trigger several pop-ups.** "MTN vs the GSE" made two history calls **in parallel**, so each asked, and neither could reuse the other's answer. Fix: one `compare_history` tool for comparisons, so it's one call and one question.
 - **Ask once per conversation, with the memory in the model.** A stateless server can't remember an answer or tell users apart, so a server-side "already asked" flag would be forgotten or leak between users. Claude *does* see the whole chat, so the instructions tell it to pass the user's earlier `display` on every later history call.
 - **Wording is behaviour.** One description said text "uses fewer tokens", and Claude started choosing `display: text` itself. It now says "never choose it yourself". After changing descriptions, click **Refresh tools list** on claude.ai.
+- **Put instructions next to the data.** Even with `display: chart`, Claude sometimes wrote prose instead of a chart. History results now start with a plain sentence ("The user chose a chart. Before your written answer, draw a line chart of …") before the JSON, because the model follows instructions beside the data more reliably than server instructions it read at the start.
 - **Test it with a script that plays the client:** answer `elicitation/create` on stdin, and count API calls with a proxy.
 
 ## 13. Connecting clients

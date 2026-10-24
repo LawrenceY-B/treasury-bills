@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import type { ApiService } from "../service/api.js";
 import { askDisplay, fetchOnce, forget, isInputRequired } from "./display.js";
-import { json, sample, wantsHistory } from "./format.js";
+import { historyResult, json, sample, wantsHistory } from "./format.js";
 import { displayArg, historyRange, insightPeriod } from "./schemas.js";
 
 export const registerMarketTools = (server: McpServer, api: ApiService) => {
@@ -25,7 +25,7 @@ export const registerMarketTools = (server: McpServer, api: ApiService) => {
 
         const [latest, history] = await data.finally(() => forget(key));
         const thinned = range.limit ? { rows: history.data, sampled: false } : sample(history.data);
-        return json({
+        return historyResult(display, "range.rows[].gseCI", {
             ...latest,
             display,
             range: {

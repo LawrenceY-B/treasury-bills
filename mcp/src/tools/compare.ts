@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { ApiService } from "../service/api.js";
 import type { RangeChange } from "../service/types.js";
 import { askDisplay, fetchOnce, forget, isInputRequired } from "./display.js";
-import { json, sample } from "./format.js";
+import { historyResult, sample } from "./format.js";
 import { displayArg, historyRange } from "./schemas.js";
 
 type Point = { date: string; value: number | null };
@@ -53,7 +53,7 @@ export const registerCompareTools = (server: McpServer, api: ApiService) => {
         if (isInputRequired(display)) return display;
 
         const series = await data.finally(() => forget(key));
-        return json({
+        return historyResult(display, "each series' rows[].rebased (one line per series, so they share a scale)", {
             display,
             series: series.map((s) => {
                 const thinned = range.limit ? { rows: s.rows, sampled: false } : sample(s.rows);
