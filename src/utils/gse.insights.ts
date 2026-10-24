@@ -7,6 +7,7 @@ import { httpError, isoDate, percentChange, round } from "./gse.format";
 import { Period, PERIODS, periodStart } from "./gse.periods";
 
 const DAY = 24 * 60 * 60 * 1000;
+const COMPARABLE_PERIODS: Period[] = ["1d", "1w", "1m"];
 
 const signed = (n: number | null, unit = "%") =>
   n === null ? "n/a" : `${n > 0 ? "+" : ""}${n.toLocaleString("en-GB", { maximumFractionDigits: 2 })}${unit}`;
@@ -119,11 +120,13 @@ export const buildInsights = async (period: Period) => {
     .filter((p) => hasRange(p) && p.close! <= p.yearLow! * 1.05)
     .map((p) => ({ symbol: p.symbol, close: p.close, yearLow: p.yearLow }));
 
-  // T-bills: the annual rate scaled to the same number of days, for a like-for-like comparison
+  // T-bills: the annual rate scaled to the same number of days, for a like-for-like comparison.
+  // Only about a month of auctions is kept, so longer periods get today's rates without a comparison.
+  const tBillComparable = COMPARABLE_PERIODS.includes(period);
   const tBills = (await latestTBills()).map((t) => ({
     tenor: t.tenor,
     interestRate: t.interestRate,
-    equivalentForPeriod: round((t.interestRate * days) / 365),
+    equivalentForPeriod: tBillComparable ? round((t.interestRate * days) / 365) : null,
   }));
 
   const when = PERIODS[period];
@@ -151,7 +154,7 @@ export const buildInsights = async (period: Period) => {
   for (const u of unusualVolume.slice(0, 3))
     summary.push(`${u.symbol} traded ${u.timesAverage}× its usual volume on ${isoDate(latestDate)}.`);
   const longest = tBills[tBills.length - 1];
-  if (longest && ci !== null)
+  if (tBillComparable && longest && ci !== null)
     summary.push(
       `For comparison, the ${longest.tenor} T-bill pays ${longest.interestRate}% a year, about ${longest.equivalentForPeriod}% over the same ${days} ${days === 1 ? "day" : "days"}, versus ${signed(ci)} for the market.`
     );
