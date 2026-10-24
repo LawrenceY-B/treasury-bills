@@ -1,5 +1,4 @@
 import { McpServer } from "@modelcontextprotocol/server"
-import { serveStdio } from "@modelcontextprotocol/server/stdio"
 import { registerPrompts } from "./prompts.js";
 import { registerResources } from "./resources.js";
 import { ApiService } from "./service/api.js";
@@ -20,14 +19,15 @@ const INSTRUCTIONS = `Ghana Treasury bill rates (Bank of Ghana weekly auctions) 
 - get_tbill_rates only has about the last month of auctions. ${BOG_LOOKUP_RULE}
 - When range.sampled is true, the rows are evenly thinned; range.change is still exact for the whole range.`;
 
-function createServer(): McpServer {
+const api = new ApiService();
+
+export function createServer(): McpServer {
     const server = new McpServer({
-        name: "treasury-bills",
+        name: "lyb-cedi-market",
         version: "1.0.0",
         description: "Ghana Treasury Bill & Stock Exchange API",
     }, { instructions: INSTRUCTIONS })
 
-    const api = new ApiService();
     registerTBillTools(server, api);
     registerStockTools(server, api);
     registerMarketTools(server, api);
@@ -36,6 +36,3 @@ function createServer(): McpServer {
 
     return server
 }
-
-void serveStdio(createServer);
-console.error('treasury-bills MCP server running on stdio');

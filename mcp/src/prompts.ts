@@ -43,11 +43,11 @@ export const registerPrompts = (server: McpServer, api: ApiService) => {
         const tBillsFromTools = period === "1w" || period === "1m";
         const tBillStep = tBillsFromTools
             ? "3. get_tbill_rates for the latest rates of all three tenors."
-            : `3. The treasury-bills tools only have about the last month of T-bill rates. ${BOG_LOOKUP_RULE}`;
+            : `3. The lyb-cedi-market tools only have about the last month of T-bill rates. ${BOG_LOOKUP_RULE}`;
         return userMessage(
             `Write the ${label} market brief for the Ghana Stock Exchange (period "${period}").
 
-Use the treasury-bills tools:
+Use the lyb-cedi-market tools:
 1. get_market_insights with period "${period}" for the overall picture.
 2. get_market with period "${period}" for the GSE Composite Index history.
 ${tBillStep}
@@ -80,7 +80,7 @@ Keep it under ${words} words, use GH¢ for prices, and don't give investment adv
         return userMessage(
             `Analyze the Ghana Stock Exchange stock ${ticker}${frequency ? ` over the ${BRIEFS[frequency].span}` : ""}.
 
-Use the treasury-bills tools: get_stock with symbol "${ticker}" and ${fetches}.
+Use the lyb-cedi-market tools: get_stock with symbol "${ticker}" and ${fetches}.
 
 Cover:
 - What the company is and its latest price (GH¢) and daily move.
