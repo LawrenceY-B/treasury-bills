@@ -2,7 +2,7 @@ import { completable, type McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import type { ApiService, InsightPeriod } from "./service/api.js";
 import { symbolCompleter } from "./completions.js";
-import { BOG_TBILL_URL } from "./tools/tbills.js";
+import { BOG_LOOKUP_RULE } from "./tools/tbills.js";
 
 // annual is the past 12 months; year-to-date runs from 1 January
 const BRIEFS = {
@@ -16,7 +16,11 @@ const BRIEFS = {
 type Frequency = keyof typeof BRIEFS;
 const FREQUENCIES = Object.keys(BRIEFS) as [Frequency, ...Frequency[]];
 
-const userMessage = (text: string) => ({
+// charts and tables are costly in tokens, so offer them instead of drawing them by default
+const OFFER_VISUAL = (subject: string) =>
+    `Don't draw a chart or table yet. End with one line offering a chart or a table of ${subject}, and only make it if I say yes.`;
+
+const userMessage =(text: string) => ({
     messages: [{ role: "user" as const, content: { type: "text" as const, text } }],
 });
 
@@ -39,7 +43,7 @@ export const registerPrompts = (server: McpServer, api: ApiService) => {
         const tBillsFromTools = period === "1w" || period === "1m";
         const tBillStep = tBillsFromTools
             ? "3. get_tbill_rates for the latest rates of all three tenors."
-            : `3. The treasury-bills tools only have about the last month of T-bill rates. If you have a web search or browsing tool, look up the rates over this period on the Bank of Ghana's T-bill page (${BOG_TBILL_URL}). If you don't, skip the T-bill comparison and say why in one line.`;
+            : `3. The treasury-bills tools only have about the last month of T-bill rates. ${BOG_LOOKUP_RULE}`;
         return userMessage(
             `Write the ${label} market brief for the Ghana Stock Exchange (period "${period}").
 
@@ -52,8 +56,8 @@ Structure the brief as:
 - Headline: how the GSE-CI and GSE-FSI moved, in one or two sentences.
 - Top 3 gainers and top 3 losers, with % changes.
 - Anything unusual: heavy volume, stocks near 52-week highs or lows.
-- Stocks vs T-bills: the market's return against the 91- and 364-day bills over the same period${tBillsFromTools ? "" : ", using the rates found on the web (if any) and saying where they came from"}.
-- If a chart or visualization tool is available, include a line chart of the GSE-CI over the period.
+- Stocks vs T-bills: the market's return against the 91- and 364-day bills over the same period${tBillsFromTools ? "" : ", using only rates from bog.gov.gh and citing the page"}.
+- ${OFFER_VISUAL("the GSE-CI over the period")}
 
 Keep it under ${words} words, use GH¢ for prices, and don't give investment advice.`
         );
@@ -82,7 +86,7 @@ Cover:
 - What the company is and its latest price (GH¢) and daily move.
 - Its return over ${returns}.
 - Where the price sits in its 52-week range, and whether recent volume is unusual.
-- If a chart or visualization tool is available, a line chart of the closing price over the ${chartSpan}.
+- ${OFFER_VISUAL(`the closing price over the ${chartSpan}`)}
 
 If the symbol is unknown, use list_stocks to suggest the closest matches. Be factual and don't give investment advice.`
         );
