@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { ApiService } from "../service/api.js";
 import { askDisplay, fetchOnce, forget, isInputRequired } from "./display.js";
 import { json, sample, wantsHistory } from "./format.js";
-import { historyRange, insightPeriod } from "./schemas.js";
+import { displayArg, historyRange, insightPeriod } from "./schemas.js";
 
 export const registerMarketTools = (server: McpServer, api: ApiService) => {
     server.registerTool("get_market", {
@@ -12,15 +12,15 @@ export const registerMarketTools = (server: McpServer, api: ApiService) => {
             "The Ghana Stock Exchange's latest market summary: GSE Composite Index (GSE-CI, all stocks), GSE Financial Stock Index (GSE-FSI, banks and financials), " +
             "total market cap (GH¢ million) and volume, each with its change from the previous trading day. " +
             "Add `period` (or `from`/`to`) to also get the daily index history and the GSE-CI's % change over that range. Index history starts in July 2023.",
-        inputSchema: z.object(historyRange),
+        inputSchema: z.object({ ...historyRange, display: displayArg }),
         annotations: { readOnlyHint: true },
-    }, async (range, ctx) => {
+    }, async ({ display: requested, ...range }, ctx) => {
         if (!wantsHistory(range)) return json(await api.getMarketData());
 
         // start loading, then ask how to show it; the retry after the answer reuses this fetch
         const key = JSON.stringify(["get_market", range]);
         const data = fetchOnce(key, () => Promise.all([api.getMarketData(), api.getMarketHistory(range)]));
-        const display = askDisplay(server, ctx);
+        const display = requested ?? askDisplay(server, ctx);
         if (isInputRequired(display)) return display;
 
         const [latest, history] = await data.finally(() => forget(key));

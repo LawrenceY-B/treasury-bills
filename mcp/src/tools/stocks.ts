@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { ApiService } from "../service/api.js";
 import { askDisplay, fetchOnce, forget, isInputRequired } from "./display.js";
 import { json, sample, wantsHistory } from "./format.js";
-import { historyRange } from "./schemas.js";
+import { displayArg, historyRange } from "./schemas.js";
 
 export const registerStockTools = (server: McpServer, api: ApiService) => {
     server.registerTool("list_stocks", {
@@ -31,15 +31,16 @@ export const registerStockTools = (server: McpServer, api: ApiService) => {
         inputSchema: z.object({
             symbol: z.string().min(1).describe("GSE ticker, e.g. MTNGH, GCB, SCB. Case-insensitive. Use list_stocks to find a company's symbol"),
             ...historyRange,
+            display: displayArg,
         }),
         annotations: { readOnlyHint: true },
-    }, async ({ symbol, ...range }, ctx) => {
+    }, async ({ symbol, display: requested, ...range }, ctx) => {
         if (!wantsHistory(range)) return json(await api.getStock(symbol));
 
         // start loading, then ask how to show it; the retry after the answer reuses this fetch
         const key = JSON.stringify(["get_stock", symbol.toUpperCase(), range]);
         const data = fetchOnce(key, () => Promise.all([api.getStock(symbol), api.getStockHistory(symbol, range)]));
-        const display = askDisplay(server, ctx);
+        const display = requested ?? askDisplay(server, ctx);
         if (isInputRequired(display)) return display;
 
         const [detail, history] = await data.finally(() => forget(key));

@@ -75,7 +75,7 @@ Conventions:
 - **Stateless HTTP builds a new server per request**, so anything that must outlive a request (the `ApiService`, caches, the `fetchOnce` map) lives at module scope, never inside `createServer`.
 - Tool and parameter descriptions are what the model reads; keep them specific (valid values, examples, which tool to use instead).
 - History responses are sampled to about 60 rows (`sample()`), with the exact change taken from the API's `meta`.
-- The display question uses v2 `inputRequired()` (the SDK's legacy shim serves 2025-era clients), checks the client's elicitation capability first, and falls back to `"chart"`. Over stateless HTTP the capability is unknown, so it always falls back to a chart.
+- The display question uses v2 `inputRequired()` (the SDK's legacy shim serves 2025-era clients), checks the client's elicitation capability first, and falls back to `"chart"`. Over HTTP it still asks clients that send their capabilities with each request (claude.ai does); clients that only declare them at `initialize` get a chart. A `display` tool argument skips the question when the user already said how to show it, and lets the model reuse one answer across several history calls.
 - Historical T-bill rates beyond about a month must come only from bog.gov.gh (`BOG_LOOKUP_RULE`, shared by the tool description, instructions and prompts).
 - Local registrations (Claude Code user scope and `claude_desktop_config.json`) must use the **absolute node path**: Claude Desktop's PATH resolves `node` to an old nvm version that can't run ESM. After code changes, `npm run build` and start a new session.
 

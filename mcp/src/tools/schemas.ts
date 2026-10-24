@@ -8,6 +8,12 @@ export const insightPeriod = z
     .enum(["1d", "1w", "1m", "3m", "6m", "ytd", "1y", "5y"])
     .describe("Range counted back from the latest trading day: 1d, 1w, 1m, 3m, 6m, ytd (year to date), 1y or 5y");
 
+export const displayArg = z
+    .enum(["chart", "table", "text"])
+    .optional()
+    .describe("How to show the history, if the user already said (e.g. \"chart it\" → chart). Set it to skip asking the user. " +
+        "When one answer needs several history calls, pass the first call's returned `display` to the rest");
+
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD");
 
 // shared by get_stock and get_market; any of these turns on the history in the response

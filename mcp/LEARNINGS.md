@@ -182,7 +182,8 @@ return inputRequired({ inputRequests: { [KEY]: inputRequired.elicit({ message, r
 - **Use `inputResponse()`,** which tells declined/cancelled apart from "not asked yet". `acceptedContent()` returns `undefined` for all three, which would ask again forever.
 - **Check the capability first.** If the client can't show forms, `inputRequired` rejects the **whole call** (`-32021`).
 - **The handler runs again** after the answer. `fetchOnce` keeps the first round's fetch, so the data loads while the question is shown and is fetched once (2 API calls, not 4).
-- **Over stateless HTTP** each request is a new server, which never saw the client declare its capabilities, so it always falls back to a chart.
+- **Over stateless HTTP** each request is a new server that never saw `initialize`. I expected that to mean "always a chart", but claude.ai sends its capabilities with every request, so the pop-up appeared live. Clients that only declare them at `initialize` get the chart default. Test with the real client before trusting your assumptions.
+- **One question can trigger several pop-ups.** "Chart the index and MTN" made two history calls, so it asked twice. Fix: an optional `display` argument that the model fills in when the user already said "chart", or copies from the first call's result.
 - **Test it with a script that plays the client:** answer `elicitation/create` on stdin, and count API calls with a proxy.
 
 ## 13. Connecting clients
