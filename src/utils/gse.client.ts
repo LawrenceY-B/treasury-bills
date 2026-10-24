@@ -53,7 +53,6 @@ export const fetchTable = async (table: Table, start = 0, length = 1000) => {
   return { rows: json.data, total: Number(json.recordsTotal) };
 };
 
-// Cells can contain HTML (e.g. links on the listed-companies page)
 export const cleanText = (value: string | null | undefined) =>
   (value ?? "")
     .replace(/<[^>]*>/g, "")
@@ -65,7 +64,6 @@ export const cleanText = (value: string | null | undefined) =>
 export const toSymbol = (value: string | null | undefined) =>
   cleanText(value).toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-// "1,638,218.00" -> 1638218, "" -> null
 export const toNumber = (value: string | null | undefined) => {
   const cleaned = cleanText(value).replace(/,/g, "").trim();
   if (cleaned === "") return null;

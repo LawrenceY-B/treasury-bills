@@ -19,9 +19,9 @@ const latestRates = (rows: IRates[]) =>
   );
 
 const tBillHtml = (rows: IRates[], total: number) => `
-<h2>💰 Latest T-bill rates</h2>
+<h2>Latest T-bill rates</h2>
 <table border="1" cellpadding="6" cellspacing="0">
-  <tr><th>Auction date</th><th>Bill</th><th>Discount rate</th><th>Interest rate</th></tr>
+  <tr><th>Issue date</th><th>Bill</th><th>Discount rate</th><th>Interest rate</th></tr>
   ${latestRates(rows)
     .map(
       (r) =>
@@ -39,7 +39,7 @@ const gseHtml = async (synced: { prices: number; summaries: number }) => {
   const movers = (rows: { symbol: string; to: number; changePercent: number }[]) =>
     rows.slice(0, 3).map((m) => `<li>${m.symbol}: GH¢${m.to.toFixed(2)} (${signed(m.changePercent)})</li>`).join("") || "<li>None</li>";
   return `
-<h2>📈 Ghana Stock Exchange (${insights.to})</h2>
+<h2>Ghana Stock Exchange (${insights.to})</h2>
 <table border="1" cellpadding="6" cellspacing="0">
   <tr><th>Index</th><th>Value</th><th>Day change</th></tr>
   <tr><td>GSE Composite Index</td><td>${market.gseCI.value}</td><td>${signed(market.gseCI.changePercent)}</td></tr>
@@ -52,20 +52,31 @@ ${insights.mostTraded[0] ? `<p><b>Most traded:</b> ${insights.mostTraded[0].symb
 <p>Synced ${synced.prices} price rows and ${synced.summaries} market summaries.</p>`;
 };
 
-// GitHub Actions sets these, so failure emails can link to the run's logs
+// BoG posts the weekly auction results on Friday; Monday catches late posts. Manual and local runs always scrape.
+const TBILL_DAYS = [6, 1]; // Saturday, Monday (UTC)
+const tBillDue = () =>
+  !process.env.CI || process.env.GITHUB_EVENT_NAME === "workflow_dispatch" || TBILL_DAYS.includes(new Date().getUTCDay());
+
 const logsLink = () =>
   process.env.GITHUB_RUN_ID
     ? `<p><a href="${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}">View the logs</a></p>`
     : "";
 
-// Each job runs independently so one failing doesn't block the other
 const runJob = async (name: string, job: () => Promise<string>) => {
   try {
     return { ok: true, html: await job() };
   } catch (error) {
     console.error(`${name} failed:`, error);
-    return { ok: false, html: `<h2>❌ ${name} failed</h2><pre>${String(error)}</pre>${logsLink()}` };
+    return { ok: false, html: `<h2>${name} failed</h2><pre>${String(error)}</pre>${logsLink()}` };
   }
+};
+
+const scrapeTBills = async () => {
+  const rows = await UpdateDB();
+  const total = await TBillData.countDocuments();
+  console.log(`T-bills: scraped ${rows.length} rows, ${total} rows in the database`);
+  if (rows.length === 0) throw new Error("Scraper returned no rows");
+  return tBillHtml(rows, total);
 };
 
 const run = async () => {
@@ -73,13 +84,9 @@ const run = async () => {
   await Promise.all([TBillData, Stock, StockPrice, MarketSummary].map((m) => m.syncIndexes()));
 
   const results = [
-    await runJob("T-bill scrape", async () => {
-      const rows = await UpdateDB();
-      const total = await TBillData.countDocuments();
-      console.log(`T-bills: scraped ${rows.length} rows, ${total} rows in the database`);
-      if (rows.length === 0) throw new Error("Scraper returned no rows");
-      return tBillHtml(rows, total);
-    }),
+    tBillDue()
+      ? await runJob("T-bill scrape", scrapeTBills)
+      : { ok: true, html: "<p>T-bills: skipped, they're only scraped on Saturdays and Mondays.</p>" },
     await runJob("GSE sync", async () => {
       const synced = await syncGse();
       console.log("GSE:", synced);
@@ -89,7 +96,6 @@ const run = async () => {
   ];
 
   if (process.env.SUMMARY_FILE) writeFileSync(process.env.SUMMARY_FILE, results.map((r) => r.html).join("\n<hr>\n"));
-  // new data is in, so drop cached API responses; a failure here must not fail the scrape
   try {
     if (cacheEnabled()) console.log(`Cache cleared: ${await clearCache()} keys`);
   } catch (error) {
@@ -102,8 +108,7 @@ run()
   .catch((error) => {
     console.error(error);
     process.exitCode = 1;
-    // e.g. the database connection failed before any job ran
     if (process.env.SUMMARY_FILE && !existsSync(process.env.SUMMARY_FILE))
-      writeFileSync(process.env.SUMMARY_FILE, `<h2>❌ Scrape failed</h2><pre>${String(error)}</pre>${logsLink()}`);
+      writeFileSync(process.env.SUMMARY_FILE, `<h2>Scrape failed</h2><pre>${String(error)}</pre>${logsLink()}`);
   })
   .finally(() => mongoose.disconnect());

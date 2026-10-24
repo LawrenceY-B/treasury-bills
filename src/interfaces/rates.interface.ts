@@ -10,4 +10,5 @@ export interface ITBill{
     discountRate:string;
     interestRate:string;
     createdAt:Date
+    updatedAt:Date
 }

@@ -10,7 +10,7 @@ export const getTBill = async (
     const data = await TBillData.find({});
     console.log('ip: '+req.ip)
 
-    if (!data) {
+    if (data.length === 0) {
       res.status(404).json({ success: false, message: "No data found" });
       return;
     }
@@ -34,7 +34,7 @@ export const getTBillDays = async (
     }
     const query = `${days} DAY BILL`;
     const data = await TBillData.find({ securityType: query });
-    if (!data) {
+    if (data.length === 0) {
       res.status(404).json({ success: false, message: "No data found" });
       return;
     }

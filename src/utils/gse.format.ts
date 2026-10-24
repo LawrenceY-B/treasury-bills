@@ -7,11 +7,9 @@ export const round = (n: number, dp = 2) => Math.round(n * 10 ** dp) / 10 ** dp;
 export const percentChange = (from: number | null | undefined, to: number | null | undefined) =>
   from && to !== null && to !== undefined ? round(((to - from) / from) * 100) : null;
 
-// Error with an HTTP status, picked up by middleware/ErrorHandler
 export const httpError = (statusCode: number, message: string) =>
   Object.assign(new Error(message), { statusCode });
 
-// "2026-10-08" -> Date, anything else -> 400
 export const parseDateParam = (value: unknown, name: string) => {
   if (value === undefined || value === "") return undefined;
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value) || isNaN(Date.parse(value)))

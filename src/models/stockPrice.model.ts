@@ -21,7 +21,6 @@ const StockPriceSchema = new Schema<IStockPrice>(
   { timestamps: true }
 );
 
-// one row per stock per trading day
 StockPriceSchema.index({ symbol: 1, date: 1 }, { unique: true });
 
 const StockPrice = model<IStockPrice>("GseStockPrice", StockPriceSchema);

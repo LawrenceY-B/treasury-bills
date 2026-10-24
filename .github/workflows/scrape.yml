@@ -2,8 +2,8 @@ name: Scrape T-bill rates and GSE data
 
 on:
   schedule:
-    - cron: "0 9 * * *" # daily at 09:00 UTC; upserts make re-runs harmless
-  workflow_dispatch: # allows a manual run from the Actions tab
+    - cron: "0 9 * * *" # daily at 09:00 UTC; T-bills only on Saturdays and Mondays (see src/scrape.ts)
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -41,14 +41,13 @@ jobs:
           password: ${{ secrets.MAIL_PASSWORD }}
           from: T-bill scraper <${{ secrets.MAIL_USERNAME }}>
           to: ${{ secrets.MAIL_USERNAME }}
-          subject: T-bill rates updated
+          subject: T-bill / GSE scrape report
           html_body: file://scrape-summary.html
 
-      # e.g. npm ci failed, so the scrape never wrote a summary
       - name: Fallback failure summary
         if: failure()
         run: |
-          test -f scrape-summary.html || echo '<h2>❌ The run failed before scraping</h2><p><a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">View the logs</a></p>' > scrape-summary.html
+          test -f scrape-summary.html || echo '<h2>The run failed before scraping</h2><p><a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">View the logs</a></p>' > scrape-summary.html
 
       - name: Email the failure
         if: failure()
@@ -61,6 +60,6 @@ jobs:
           password: ${{ secrets.MAIL_PASSWORD }}
           from: T-bill scraper <${{ secrets.MAIL_USERNAME }}>
           to: ${{ secrets.MAIL_USERNAME }}
-          subject: ❌ T-bill / GSE scrape failed
+          subject: T-bill / GSE scrape failed
           html_body: file://scrape-summary.html
           body: "Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

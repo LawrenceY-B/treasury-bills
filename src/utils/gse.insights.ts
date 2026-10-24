@@ -11,7 +11,6 @@ const DAY = 24 * 60 * 60 * 1000;
 const signed = (n: number | null, unit = "%") =>
   n === null ? "n/a" : `${n > 0 ? "+" : ""}${n.toLocaleString("en-GB", { maximumFractionDigits: 2 })}${unit}`;
 
-// "rose 2.1%", "fell 5.47%", "was flat"
 const moved = (n: number | null, unit = "%") =>
   n === null || n === 0
     ? "was flat"
@@ -27,7 +26,6 @@ const closesAsOf = async (date: Date, symbols: string[]) => {
   return new Map(rows.map((r) => [r._id, r.close]));
 };
 
-// Latest T-bill rate per tenor ("91 DAY BILL" etc.)
 const latestTBills = async () => {
   const rows = await TBillData.find({}).lean();
   const byTenor = new Map<string, { tenor: string; date: Date; interestRate: number }>();
@@ -50,7 +48,6 @@ export const buildInsights = async (period: Period) => {
   const start = periodStart(period, latestDate);
   const days = Math.max(1, Math.round((latestDate.getTime() - start.getTime()) / DAY));
 
-  // Market: compare the latest summary with the one at the start of the period
   const baseSummary = await MarketSummary.findOne(
     period === "1d" ? { date: { $lt: latestSummary.date } } : { date: { $lte: start } }
   )
@@ -72,7 +69,6 @@ export const buildInsights = async (period: Period) => {
     },
   };
 
-  // Stocks: everything that has a price on the latest trading day
   const today = await StockPrice.find({ date: latestDate }).lean<IStockPrice[]>();
   const symbols = today.map((p) => p.symbol);
   const names = new Map((await Stock.find({ symbol: { $in: symbols } }).lean()).map((s) => [s.symbol, s.name]));

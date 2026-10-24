@@ -1,14 +1,14 @@
-# 💰 Ghana Treasury Bill & Stock Exchange API 💹
+# Ghana Treasury Bill & Stock Exchange API
 
 An API for **Bank of Ghana Treasury Bill rates** and **Ghana Stock Exchange (GSE)** prices, market indices and plain-English insights.
 
 **Base URL:** `https://treasury-bills.onrender.com/api`
 
-> 🚧 Hosted on Render's free tier, so the first request after a quiet spell can take 30–60 seconds.
+> Hosted on Render's free tier, so the first request after a quiet spell can take 30–60 seconds.
 
 Open the base URL without `/api` to get a JSON list of every endpoint.
 
-## 🚀 Endpoints
+## Endpoints
 
 All endpoints are `GET` and return `{ "success": true, "data": ..., "meta": ... }`. Prices are in GH¢ and dates are `YYYY-MM-DD`.
 
@@ -34,13 +34,13 @@ Example: `/gse/stocks/MTNGH/history?period=6m`
 
 Symbols are case-insensitive, and missing values are `null`. Errors look like `{ "success": false, "message": "..." }`.
 
-## ⚡ Caching (optional)
+## Caching (optional)
 
 Responses are cached in Redis for 24 hours, and the daily scrape clears the cache. Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from a free [Upstash](https://upstash.com) database to turn it on. Without them the API reads straight from MongoDB.
 
 Check it with `curl -i <url>`: the `X-Cache` header is `MISS` the first time and `HIT` after.
 
-## 💻 Run Locally
+## Run Locally
 
 You need **Node.js 22.12+**, a **MongoDB** database (e.g. a free Atlas cluster) and **Google Chrome** (only for scraping).
 
@@ -69,16 +69,16 @@ npm run gse:backfill  # one-off: import all GSE history (takes ~7 minutes)
 
 For production, run `npm run build` then `npm start`.
 
-## ☁️ Deployment
+## Deployment
 
 - **Scraper:** a GitHub Actions workflow (`.github/workflows/scrape.yml`) runs every day at 09:00 UTC and emails a summary. Add these repo secrets: `DB_URL`, `MAIL_USERNAME`, `MAIL_PASSWORD` (a Gmail [app password](https://myaccount.google.com/apppasswords)), and optionally the two Upstash values.
 - **API:** any Node host, e.g. Render. Build with `npm install && npm run build`, start with `npm start`, and set `DB_URL`, `PUPPETEER_SKIP_DOWNLOAD=true` and optionally the two Upstash values.
 
-## 📊 Data Sources
+## Data Sources
 
 - **Treasury Bills:** [Bank of Ghana Treasury Bill Rates](https://www.bog.gov.gh/treasury-and-the-markets/treasury-bill-rates/)
 - **Stock exchange:** [GSE trading data](https://gse.com.gh/trading-and-data/) and [listed companies](https://gse.com.gh/listed-companies/)
 
-## 💻 Built With
+## Built With
 
 TypeScript · Express · MongoDB · Puppeteer · Upstash Redis
