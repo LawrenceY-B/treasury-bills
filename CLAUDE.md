@@ -65,7 +65,7 @@ npm run typecheck
 Layout:
 - `src/server.ts`: `createServer()` factory plus the server `INSTRUCTIONS`. Both transports use it.
 - `src/stdio.ts` and `src/http.ts`: entry points. HTTP is Express with the SDK's stateless `createMcpHandler`; Host/Origin checks guard `/mcp` only, so `/health` stays open for Render.
-- `src/tools/`: `get_tbill_rates`, `list_stocks`, `get_stock`, `get_market`, `get_market_insights`, plus shared zod schemas (`schemas.ts`), response helpers (`format.ts`) and the chart/table/text question (`display.ts`).
+- `src/tools/`: `get_tbill_rates`, `list_stocks`, `get_stock`, `get_market`, `get_market_insights`, `compare_history` (several series in one call, rebased to 100), plus shared zod schemas (`schemas.ts`), response helpers (`format.ts`) and the chart/table/text question (`display.ts`).
 - `src/prompts.ts` (`market_brief`, `analyze_stock`, frequencies in `BRIEFS`), `src/resources.ts` (`gse://stocks`, `gse://stocks/{symbol}`), `src/completions.ts`.
 - `src/service/`: the REST client (`httpClient.ts`), one method per endpoint (`api.ts`), paths (`endpoints.ts`) and response types (`types.ts`).
 
@@ -75,7 +75,7 @@ Conventions:
 - **Stateless HTTP builds a new server per request**, so anything that must outlive a request (the `ApiService`, caches, the `fetchOnce` map) lives at module scope, never inside `createServer`.
 - Tool and parameter descriptions are what the model reads; keep them specific (valid values, examples, which tool to use instead).
 - History responses are sampled to about 60 rows (`sample()`), with the exact change taken from the API's `meta`.
-- The display question uses v2 `inputRequired()` (the SDK's legacy shim serves 2025-era clients), checks the client's elicitation capability first, and falls back to `"chart"`. Over HTTP it still asks clients that send their capabilities with each request (claude.ai does); clients that only declare them at `initialize` get a chart. A `display` tool argument skips the question when the user already said how to show it, and lets the model reuse one answer across several history calls.
+- The display question uses v2 `inputRequired()` (the SDK's legacy shim serves 2025-era clients), checks the client's elicitation capability first, and falls back to `"chart"`. Over HTTP it still asks clients that send their capabilities with each request (claude.ai does); clients that only declare them at `initialize` get a chart. It's asked **once per conversation**: the server is stateless and can't tell users apart, so the instructions make Claude pass the user's earlier `display` on every later history call. Comparisons go through `compare_history`, because parallel `get_stock`/`get_market` calls would each ask.
 - Historical T-bill rates beyond about a month must come only from bog.gov.gh (`BOG_LOOKUP_RULE`, shared by the tool description, instructions and prompts).
 - Local registrations (Claude Code user scope and `claude_desktop_config.json`) must use the **absolute node path**: Claude Desktop's PATH resolves `node` to an old nvm version that can't run ESM. After code changes, `npm run build` and start a new session.
 

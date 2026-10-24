@@ -11,7 +11,7 @@ export const registerMarketTools = (server: McpServer, api: ApiService) => {
         description:
             "The Ghana Stock Exchange's latest market summary: GSE Composite Index (GSE-CI, all stocks), GSE Financial Stock Index (GSE-FSI, banks and financials), " +
             "total market cap (GH¢ million) and volume, each with its change from the previous trading day. " +
-            "Add `period` (or `from`/`to`) to also get the daily index history and the GSE-CI's % change over that range. Index history starts in July 2023.",
+            "Add `period` (or `from`/`to`) to also get the daily index history and the GSE-CI's % change over that range. Index history starts in July 2023. To compare the index with stocks, use compare_history instead.",
         inputSchema: z.object({ ...historyRange, display: displayArg }),
         annotations: { readOnlyHint: true },
     }, async ({ display: requested, ...range }, ctx) => {

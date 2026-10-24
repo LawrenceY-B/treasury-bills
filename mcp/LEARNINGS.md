@@ -183,7 +183,9 @@ return inputRequired({ inputRequests: { [KEY]: inputRequired.elicit({ message, r
 - **Check the capability first.** If the client can't show forms, `inputRequired` rejects the **whole call** (`-32021`).
 - **The handler runs again** after the answer. `fetchOnce` keeps the first round's fetch, so the data loads while the question is shown and is fetched once (2 API calls, not 4).
 - **Over stateless HTTP** each request is a new server that never saw `initialize`. I expected that to mean "always a chart", but claude.ai sends its capabilities with every request, so the pop-up appeared live. Clients that only declare them at `initialize` get the chart default. Test with the real client before trusting your assumptions.
-- **One question can trigger several pop-ups.** "Chart the index and MTN" made two history calls, so it asked twice. Fix: an optional `display` argument that the model fills in when the user already said "chart", or copies from the first call's result.
+- **One question can trigger several pop-ups.** "MTN vs the GSE" made two history calls **in parallel**, so each asked, and neither could reuse the other's answer. Fix: one `compare_history` tool for comparisons, so it's one call and one question.
+- **Ask once per conversation, with the memory in the model.** A stateless server can't remember an answer or tell users apart, so a server-side "already asked" flag would be forgotten or leak between users. Claude *does* see the whole chat, so the instructions tell it to pass the user's earlier `display` on every later history call.
+- **Wording is behaviour.** One description said text "uses fewer tokens", and Claude started choosing `display: text` itself. It now says "never choose it yourself". After changing descriptions, click **Refresh tools list** on claude.ai.
 - **Test it with a script that plays the client:** answer `elicitation/create` on stdin, and count API calls with a proxy.
 
 ## 13. Connecting clients

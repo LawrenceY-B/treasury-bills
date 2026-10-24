@@ -11,8 +11,8 @@ export const insightPeriod = z
 export const displayArg = z
     .enum(["chart", "table", "text"])
     .optional()
-    .describe("Only set this if the user explicitly asked for a chart, a table or text in their message, or to reuse the `display` an earlier call in this answer returned. " +
-        "Never choose it yourself (not even to save tokens): leave it out and the user is asked, with chart as the default");
+    .describe("Set this to the choice the user already made in this conversation (an earlier result's `display`), or when they explicitly ask for a chart, a table or text. " +
+        "Never choose it yourself (not even to save tokens): leave it out and the user is asked once, with chart as the default");
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD");
 

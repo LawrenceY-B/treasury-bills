@@ -27,6 +27,7 @@ claude mcp add --transport http lyb-cedi-market https://lyb-cedi-market.onrender
 | `get_stock` | One stock's details and latest quote; add `period` (or `from`/`to`) for its price history and % change |
 | `get_market` | GSE Composite and Financial indices, market cap and volume; add `period` for their history |
 | `get_market_insights` | Whole-market analysis: summary, top gainers and losers, unusual volume, 52-week highs and lows |
+| `compare_history` | Several stocks (up to 5), optionally with the GSE Composite Index, in one call, with each series rebased to 100 for charting on one scale |
 
 Periods are `1d`, `1w`, `1m`, `3m`, `6m`, `ytd`, `1y`, `5y` or `max` (insights has no `max`). Long histories are sampled down to about 60 rows; the % change is still exact.
 
@@ -43,7 +44,7 @@ In Claude Code: `/lyb-cedi-market:market_brief quarterly` or `/lyb-cedi-market:a
 - `gse://stocks/{symbol}`: one stock's details and latest quote
 
 ### Charts
-When a history tool runs, clients that support forms ask whether you want a **chart** (default), a **table** or **text only**. Other clients get a chart.
+The first time a history tool runs in a conversation, clients that support forms ask whether you want a **chart** (default), a **table** or **text only**. Claude then reuses your answer for the rest of the conversation. Other clients get a chart.
 
 The API only keeps about a month of T-bill auctions. For longer comparisons the server tells the model to take rates only from the [Bank of Ghana](https://www.bog.gov.gh/treasury-and-the-markets/treasury-bill-rates/), or skip the comparison.
 

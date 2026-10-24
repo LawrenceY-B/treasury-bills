@@ -27,7 +27,7 @@ export const registerStockTools = (server: McpServer, api: ApiService) => {
         description:
             "One Ghana Stock Exchange stock: company name, board and latest quote (prices in GH¢). " +
             "Add `period` (or `from`/`to`) to also get its daily price history and the % change over that range, e.g. period=ytd for this year's return. " +
-            "History goes back to 2007 for older stocks.",
+            "History goes back to 2007 for older stocks. To compare several stocks or a stock against the market, use compare_history instead.",
         inputSchema: z.object({
             symbol: z.string().min(1).describe("GSE ticker, e.g. MTNGH, GCB, SCB. Case-insensitive. Use list_stocks to find a company's symbol"),
             ...historyRange,
