@@ -156,5 +156,5 @@ export interface Insights {
     unusualVolume: { symbol: string; volume: number; averageVolume: number; timesAverage: number }[];
     near52WeekHigh: { symbol: string; close: number | null; yearHigh: number | null }[];
     near52WeekLow: { symbol: string; close: number | null; yearLow: number | null }[];
-    tBills: { tenor: string; interestRate: number; equivalentForPeriod: number }[];
+    tBills: { tenor: string; interestRate: number; equivalentForPeriod: number | null }[]; // null for periods over 1m
 }

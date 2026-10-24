@@ -37,7 +37,7 @@ export const registerMarketTools = (server: McpServer, api: ApiService) => {
         description:
             "Precomputed analysis of the whole Ghana Stock Exchange over a period: plain-English summary, index and market-cap changes, " +
             "how many stocks rose or fell, top gainers and losers, most traded stocks, unusual volume, stocks near 52-week highs or lows, " +
-            "and T-bill rates scaled to the same period for comparison. " +
+            "and, for periods up to 1m, T-bill rates scaled to the same period for comparison (longer periods only get today's rates). " +
             "Use for 'how is the market doing', 'top movers', or 'stocks vs T-bills' questions instead of fetching every stock.",
         inputSchema: z.object({
             period: insightPeriod.optional().describe("Defaults to 1m. Options: 1d, 1w, 1m, 3m, 6m, ytd, 1y, 5y"),
